@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Seguridad - Stark Industries</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+<header>
+    <h1>Stark Industries - Sistema de Seguridad Concurrente</h1>
+    <div>
+        <span id="user-info" class="user-role">Usuario: cargando...</span>
+        <a href="/logout"><button id="logout-btn" class="logout-btn">Cerrar sesión</button></a>
+    </div>
+</header>
+
+<main>
+    <section id="alertas">
+        <h2>Alertas en Tiempo Real</h2>
+        <div id="alert-container"></div>
+    </section>
+
+    <section id="monitoreo">
+        <h2>Monitoreo de Sensores</h2>
+
+        <div class="sensor-controls">
+            <button id="pause-btn" class="control-btn">⏸ Pausar</button>
+            <button id="reset-btn" class="control-btn">🔄 Resetear</button>
+        </div>
+
+        <div class="charts">
+            <canvas id="chartMovimiento"></canvas>
+            <canvas id="chartTemperatura"></canvas>
+            <canvas id="chartAcceso"></canvas>
+        </div>
+    </section>
+
+    <section id="eventos">
+        <h2>Eventos Recientes</h2>
+        <table>
+            <thead>
+            <tr><th>Hora</th><th>Sensor</th><th>Valor</th><th>Crítico</th></tr>
+            </thead>
+            <tbody id="tabla-eventos"></tbody>
+        </table>
+    </section>
+</main>
+
+<footer>
+    <p>© 2025 Stark Industries. Sistema de Seguridad Concurrente desarrollado con Spring Boot.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

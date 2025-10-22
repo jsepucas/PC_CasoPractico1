@@ -29,9 +29,9 @@ public class SensorController {
     @PostMapping("/data")
     public ResponseEntity<String> receiveData(@RequestBody SensorData data) {
         switch (data.getType().toLowerCase()) {
-            case "movimiento" -> motionService.processSensorData(data);
-            case "temperatura" -> tempService.processSensorData(data);
-            case "acceso" -> accessService.processSensorData(data);
+            case "Movimiento" -> motionService.processSensorData(data);
+            case "Temperatura" -> tempService.processSensorData(data);
+            case "Acceso" -> accessService.processSensorData(data);
             default -> System.out.println("Tipo de sensor no reconocido: " + data.getType());
         }
         return ResponseEntity.ok("Datos recibidos y procesados concurrentemente.");

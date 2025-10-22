@@ -1,17 +1,16 @@
 package com.starkindustries.securitysystem.Model;
 
 /**
- * Representa la información genérica enviada por cualquier sensor del sistema.
+ * Clase modelo que representa una lectura de sensor.
  */
 public class SensorData {
 
-    private String type;       // Tipo de sensor: movimiento, temperatura, acceso
-    private double value;      // Valor medido
-    private long timestamp;    // Momento de la lectura en milisegundos
-    private boolean critical;  // Indica si el evento es crítico o no
+    private String type;
+    private double value;
+    private long timestamp;
+    private boolean critical;
 
-    public SensorData() {
-    }
+    public SensorData() {}
 
     public SensorData(String type, double value, long timestamp, boolean critical) {
         this.type = type;

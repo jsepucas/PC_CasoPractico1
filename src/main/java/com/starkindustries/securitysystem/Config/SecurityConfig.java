@@ -14,40 +14,35 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Configuración central de seguridad del sistema.
- *
- * Define los usuarios, roles y permisos de acceso a los endpoints REST.
- * En esta versión inicial, los usuarios se cargan en memoria.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Configura la cadena de filtros de seguridad.
-     *
-     * - Desactiva CSRF para facilitar las pruebas REST.
-     * - Define permisos de acceso según el rol del usuario.
-     * - Habilita autenticación básica y formulario.
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/dashboard", "/user").authenticated()
                         .requestMatchers("/api/sensor/data").hasAnyRole("ADMIN", "TECH")
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
-                .formLogin(Customizer.withDefaults())   // Login por formulario
-                .httpBasic(Customizer.withDefaults());  // Login por cabecera HTTP (útil para Postman)
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/dashboard", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                )
+                .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 
-    /**
-     * Define usuarios y roles almacenados en memoria.
-     *
-     * En producción, esto se reemplazaría por un UserDetailsService conectado a base de datos.
-     */
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails admin = User.withDefaultPasswordEncoder()
