@@ -122,3 +122,57 @@ footer {
     font-size: 0.9rem;
     margin-top: 30px;
 }
+.sensor-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.control-btn {
+  background-color: #4ea1ff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.control-btn:hover {
+  background-color: #1f6fe0;
+  transform: scale(1.03);
+}
+
+.alert {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  box-shadow: 0 0 8px #e74c3c80;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#tabla-eventos {
+  width: 100%;
+  color: white;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#tabla-eventos th, #tabla-eventos td {
+  border-bottom: 1px solid #333;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+#tabla-eventos tr:nth-child(even) {
+  background-color: #1a1a1a;
+}

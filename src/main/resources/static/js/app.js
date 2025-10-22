@@ -1,129 +1,145 @@
-let stompClient = null;
+let paused = false;
 
-// ========================
-// Conexión WebSocket (STOMP)
-// ========================
-function connectWebSocket() {
-    const socket = new SockJS('/ws/alerts');
-    stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, (frame) => {
-        console.log('Conectado:', frame);
-
-        // Suscribirse a los datos de sensores
-        stompClient.subscribe('/topic/data', (msg) => {
-            const data = JSON.parse(msg.body);
-            updateSensorChart(data.type, data.value);
-            addEventToTable(data);
-        });
-
-        // Suscribirse a las alertas críticas
-        stompClient.subscribe('/topic/alerts', (alert) => {
-            const message = JSON.parse(alert.body);
-            showAlert(message.content);
-        });
-    });
-}
-
-// ========================
-// Tablas y alertas
-// ========================
-function addEventToTable(data) {
-    const tbody = document.querySelector("#eventTable tbody");
-    const row = document.createElement("tr");
-    const date = new Date(data.timestamp).toLocaleTimeString();
-
-    row.innerHTML = `
-        <td>${date}</td>
-        <td>${data.type}</td>
-        <td>${data.value.toFixed(2)}</td>
-        <td>${data.critical ? '⚠️' : '—'}</td>
-    `;
-    tbody.prepend(row);
-
-    // Limitar la tabla a 15 filas
-    if (tbody.rows.length > 15) tbody.deleteRow(15);
-}
-
-function showAlert(content) {
-    const alertFeed = document.getElementById('alertFeed');
-    const div = document.createElement('div');
-    div.classList.add('alert');
-    div.textContent = content;
-    alertFeed.prepend(div);
-
-    setTimeout(() => div.remove(), 7000);
-}
-
-// ========================
-// Gráficas con Chart.js
-// ========================
-const charts = {
-    movimiento: new Chart(document.getElementById('chart-movimiento'), createChartConfig('Sensor de Movimiento')),
-    temperatura: new Chart(document.getElementById('chart-temperatura'), createChartConfig('Sensor de Temperatura')),
-    acceso: new Chart(document.getElementById('chart-acceso'), createChartConfig('Sensor de Acceso'))
+// Estructuras para almacenar datos de los sensores
+const sensorData = {
+  movimiento: [],
+  temperatura: [],
+  acceso: []
 };
 
-function createChartConfig(label) {
-    return {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label,
-                data: [],
-                borderWidth: 2,
-                borderColor: '#58a6ff',
-                backgroundColor: 'rgba(88,166,255,0.1)',
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            scales: {
-                x: { display: false },
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Valor' },
-                    ticks: { color: '#c9d1d9' }
-                }
-            },
-            plugins: {
-                legend: { labels: { color: '#c9d1d9' } }
-            }
-        }
-    };
-}
+// Crear las gráficas
+const charts = {
+  movimiento: createChart('chartMovimiento', 'Sensor de Movimiento', '#4ea1ff'),
+  temperatura: createChart('chartTemperatura', 'Sensor de Temperatura', '#ffb14e'),
+  acceso: createChart('chartAcceso', 'Sensor de Acceso', '#ff4e4e')
+};
 
-function updateSensorChart(type, value) {
-    const chart = charts[type];
-    if (!chart) return;
-
-    const labels = chart.data.labels;
-    labels.push(labels.length + 1);
-    chart.data.datasets[0].data.push(value);
-
-    if (labels.length > 20) {
-        labels.shift();
-        chart.data.datasets[0].data.shift();
+// Crear un gráfico de tipo línea con Chart.js
+function createChart(id, label, color) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label,
+        borderColor: color,
+        backgroundColor: color + "33",
+        borderWidth: 2,
+        pointRadius: 3,
+        data: []
+      }]
+    },
+    options: {
+      animation: false,
+      scales: {
+        y: { beginAtZero: true }
+      },
+      plugins: { legend: { labels: { color: "#fff" } } }
     }
-
-    chart.update();
+  });
 }
 
-// ========================
-// Inicialización
-// ========================
-document.addEventListener("DOMContentLoaded", () => {
-    connectWebSocket();
+// Actualiza los gráficos
+function updateCharts() {
+  Object.keys(charts).forEach(sensor => {
+    charts[sensor].data.labels = sensorData[sensor].map((_, i) => i + 1);
+    charts[sensor].data.datasets[0].data = sensorData[sensor];
+    charts[sensor].update();
+  });
+}
 
-    // Mostrar el rol actual desde el backend (Spring Security)
-    fetch('/user')
-        .then(res => res.json())
-        .then(user => {
-            document.getElementById("userRole").textContent = `Usuario: ${user.username} (${user.role})`;
-        })
-        .catch(() => {
-            document.getElementById("userRole").textContent = "Usuario: Desconocido";
-        });
+// Maneja nueva lectura simulada
+function onNewSensorData(sensor, value, isCritical) {
+  if (paused) return;
+
+  sensorData[sensor].push(value);
+  if (sensorData[sensor].length > 20) sensorData[sensor].shift();
+  updateCharts();
+
+  const hora = new Date().toLocaleTimeString();
+  const evento = {
+    hora,
+    sensor,
+    valor: value.toFixed(2),
+    critico: isCritical ? "⚠️" : "—"
+  };
+  addEventRow(evento);
+
+  if (isCritical) {
+    showAlert(`Alerta crítica detectada en sensor de ${sensor.toUpperCase()} (valor: ${value.toFixed(2)})`);
+  }
+}
+
+// Mostrar alerta en tiempo real
+function showAlert(message) {
+  const container = document.getElementById("alert-container");
+  const alert = document.createElement("div");
+  alert.className = "alert";
+  alert.textContent = message;
+  container.prepend(alert);
+  setTimeout(() => alert.remove(), 5000);
+}
+
+// Añadir evento a la tabla de eventos recientes
+function addEventRow({ hora, sensor, valor, critico }) {
+  const tabla = document.getElementById("tabla-eventos");
+  const fila = document.createElement("tr");
+  fila.innerHTML = `<td>${hora}</td><td>${sensor}</td><td>${valor}</td><td>${critico}</td>`;
+  tabla.prepend(fila);
+  if (tabla.rows.length > 10) tabla.deleteRow(10);
+}
+
+// Control de pausa / reanudación
+document.getElementById("pause-btn").addEventListener("click", () => {
+  paused = !paused;
+  document.getElementById("pause-btn").textContent = paused ? "▶ Reanudar" : "⏸ Pausar";
 });
+
+// Resetear estadísticas
+document.getElementById("reset-btn").addEventListener("click", () => {
+  Object.keys(sensorData).forEach(sensor => sensorData[sensor] = []);
+  document.getElementById("tabla-eventos").innerHTML = "";
+  document.getElementById("alert-container").innerHTML = "";
+  updateCharts();
+});
+
+// Simulación de lecturas en tiempo real
+setInterval(() => {
+  const sensores = ["movimiento", "temperatura", "acceso"];
+  const sensor = sensores[Math.floor(Math.random() * sensores.length)];
+
+  let valor;
+  let isCritical = false;
+
+  switch (sensor) {
+    case "movimiento":
+      valor = Math.random() * 100;
+      isCritical = valor > 80;
+      break;
+    case "temperatura":
+      valor = 15 + Math.random() * 25;
+      isCritical = valor > 35;
+      break;
+    case "acceso":
+      valor = Math.random() > 0.5 ? 1 : 0;
+      isCritical = valor === 1 && Math.random() > 0.8;
+      break;
+  }
+
+  onNewSensorData(sensor, valor, isCritical);
+}, 2000);
+
+// Mostrar usuario autenticado
+async function loadUserInfo() {
+  try {
+    const res = await fetch("/user");
+    const data = await res.json();
+    document.getElementById("user-info").textContent =
+      `Usuario: ${data.username} (${data.role.replace("ROLE_", "")})`;
+  } catch {
+    document.getElementById("user-info").textContent = "Usuario: desconocido";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadUserInfo);
