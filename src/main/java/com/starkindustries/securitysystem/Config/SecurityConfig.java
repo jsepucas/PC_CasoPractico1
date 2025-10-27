@@ -12,9 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * Configuración central de seguridad del sistema.
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -25,17 +22,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/dashboard", "/user").authenticated()
-                        .requestMatchers("/api/sensor/data").hasAnyRole("ADMIN", "TECH")
+                        .requestMatchers("/api/sensor/**").hasAnyRole("ADMIN", "TECH")
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
+                        .loginPage("/login")                 // Ruta personalizada de login
                         .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login?logout")   // Redirige al login tras logout
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());

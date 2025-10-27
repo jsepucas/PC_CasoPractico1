@@ -130,16 +130,39 @@ setInterval(() => {
   onNewSensorData(sensor, valor, isCritical);
 }, 2000);
 
-// Mostrar usuario autenticado
+// ========== MOSTRAR USUARIO ==========
 async function loadUserInfo() {
   try {
     const res = await fetch("/user");
     const data = await res.json();
-    document.getElementById("user-info").textContent =
-      `Usuario: ${data.username} (${data.role.replace("ROLE_", "")})`;
+    document.getElementById("user-info").textContent = `Usuario: ${data.username}`;
   } catch {
     document.getElementById("user-info").textContent = "Usuario: desconocido";
   }
 }
-
 document.addEventListener("DOMContentLoaded", loadUserInfo);
+
+// ========== SELECCIÓN DE SENSORES ==========
+const toggleSelector = document.getElementById("toggleSelector");
+const dropdown = document.getElementById("sensorDropdown");
+const options = document.querySelectorAll(".sensor-option");
+let activeSensor = "movimiento"; // gráfico mostrado por defecto
+
+toggleSelector.addEventListener("click", () => {
+  dropdown.classList.toggle("hidden");
+});
+
+options.forEach(opt => {
+  opt.addEventListener("click", () => {
+    const selected = opt.dataset.sensor;
+    document.querySelectorAll(".sensor-chart").forEach(canvas => canvas.classList.add("hidden"));
+    document.getElementById(`chart${capitalize(selected)}`).classList.remove("hidden");
+    dropdown.classList.add("hidden");
+    toggleSelector.textContent = `Sensor: ${capitalize(selected)} ▾`;
+    activeSensor = selected;
+  });
+});
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

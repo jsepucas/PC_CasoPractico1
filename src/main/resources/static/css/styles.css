@@ -1,165 +1,184 @@
+/* css */
+/* ============= DASHBOARD LAYOUT ============= */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #0d1117;
-    color: #e6edf3;
-    margin: 0;
-    padding: 0;
-}
-
-/* Encabezado */
-header {
-    background-color: #161b22;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-}
-
-header h1 {
-    font-size: 1.2rem;
-    color: #58a6ff;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logout-btn {
-    background-color: #238636;
-    border: none;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.logout-btn:hover {
-    background-color: #2ea043;
-}
-
-/* Secciones */
-main {
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-h2 {
-    color: #58a6ff;
-    border-bottom: 2px solid #58a6ff;
-    padding-bottom: 5px;
-}
-
-/* Alertas */
-.alert-feed {
-    background-color: #11151f;
-    padding: 15px;
-    border-radius: 8px;
-    min-height: 120px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.alert {
-    background-color: #da3633;
-    color: white;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-/* Gráficas */
-.chart-container {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.chart-card {
-    background-color: #11151f;
-    padding: 15px;
-    border-radius: 10px;
-    width: 350px;
-}
-
-canvas {
-    width: 100%;
-    height: 200px;
-}
-
-/* Tabla */
-#table-section table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #11151f;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-#eventTable th, #eventTable td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #1e2635;
-}
-
-#eventTable th {
-    background-color: #182032;
-    color: #77b3ff;
-}
-
-/* Footer */
-footer {
-    background-color: #161b22;
-    text-align: center;
-    padding: 15px;
-    color: #8b949e;
-    font-size: 0.9rem;
-    margin-top: 30px;
-}
-.sensor-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.control-btn {
-  background-color: #4ea1ff;
+  background-color: #0d0f14;
   color: white;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #11141a;
+  padding: 15px 30px;
+  box-shadow: 0 0 10px #00000080;
+}
+
+/* Asegura layout en línea para el grupo de usuario/acciones y añade espacio */
+header > div,
+header .user-actions,
+header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* espacio horizontal entre usuario y cerrar sesión */
+}
+
+h1 {
+  font-size: 1.3rem;
+  color: #4ea1ff;
+  margin: 0;
+}
+
+/* Botón base reutilizable para logout, pause, reset, etc. */
+.btn {
+  background-color: #4ea1ff;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.control-btn:hover {
-  background-color: #1f6fe0;
-  transform: scale(1.03);
-}
-
-.alert {
-  background-color: #e74c3c;
   color: white;
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  box-shadow: 0 0 8px #e74c3c80;
   font-weight: 500;
-  animation: fadeIn 0.3s ease-out;
+  transition: filter 0.12s ease, transform 0.06s ease;
+  box-shadow: 0 1px 0 #00000030;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.btn:hover {
+  filter: brightness(0.95);
 }
 
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Variante secundaria (por ejemplo para reset) */
+.btn.secondary {
+  background-color: #6c757d;
+}
+
+/* Si tus botones actualmente tienen IDs, asegúrate que reciban el mismo estilo */
+#pause-btn,
+#reset-btn,
+.logout-btn {
+  /* aplica las mismas reglas que .btn */
+  background-color: #4ea1ff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-weight: 500;
+  transition: filter 0.12s ease, transform 0.06s ease;
+  box-shadow: 0 1px 0 #00000030;
+}
+
+#reset-btn {
+  /* si quieres que reset sea secundaria */
+  background-color: #6c757d;
+}
+
+#pause-btn:hover,
+#reset-btn:hover,
+.logout-btn:hover {
+  filter: brightness(0.95);
+}
+
+#pause-btn:active,
+#reset-btn:active,
+.logout-btn:active {
+  transform: translateY(1px);
+}
+
+main {
+  padding: 30px;
+}
+
+/* ============= SECCIONES ============= */
+section {
+  background-color: #161b22;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 0 8px #4ea1ff20;
+}
+
+h2 {
+  border-bottom: 2px solid #4ea1ff;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #11141a;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* ============= SELECTOR DE SENSORES ============= */
+.sensor-selector {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+#toggleSelector {
+  background-color: #4ea1ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background-color: #1d232b;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #00000060;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.sensor-option {
+  color: white;
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sensor-option:hover {
+  background-color: #4ea1ff40;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============= CHARTS ============= */
+.charts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.sensor-chart {
+  width: 600px;
+  height: 350px;
+  background-color: #10141b;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* ============= TABLA DE EVENTOS ============= */
 #tabla-eventos {
   width: 100%;
   color: white;
@@ -175,4 +194,21 @@ footer {
 
 #tabla-eventos tr:nth-child(even) {
   background-color: #1a1a1a;
+}
+
+/* ============= ALERTAS ============= */
+.alert {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  box-shadow: 0 0 8px #e74c3c80;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

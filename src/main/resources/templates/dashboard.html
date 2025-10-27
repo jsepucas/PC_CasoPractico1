@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title>Panel de Seguridad - Stark Industries</title>
-
+    <link rel="icon" type="image/png" href="/images/icon.png" th:href="@{/images/icon.png}">
+    <link rel="shortcut icon" href="/images/icon.png" th:href="@{/images/icon.png}">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -24,15 +26,27 @@
     <section id="monitoreo">
         <h2>Monitoreo de Sensores</h2>
 
+        <!-- Selector de sensor -->
+        <div class="sensor-selector">
+            <button id="toggleSelector">Seleccionar sensor ▾</button>
+            <div id="sensorDropdown" class="dropdown hidden">
+                <button class="sensor-option" data-sensor="movimiento">Sensor de Movimiento</button>
+                <button class="sensor-option" data-sensor="temperatura">Sensor de Temperatura</button>
+                <button class="sensor-option" data-sensor="acceso">Sensor de Acceso</button>
+            </div>
+        </div>
+
+        <!-- Controles -->
         <div class="sensor-controls">
             <button id="pause-btn" class="control-btn">⏸ Pausar</button>
             <button id="reset-btn" class="control-btn">🔄 Resetear</button>
         </div>
 
+        <!-- Contenedor dinámico del gráfico -->
         <div class="charts">
-            <canvas id="chartMovimiento"></canvas>
-            <canvas id="chartTemperatura"></canvas>
-            <canvas id="chartAcceso"></canvas>
+            <canvas id="chartMovimiento" class="sensor-chart"></canvas>
+            <canvas id="chartTemperatura" class="sensor-chart hidden"></canvas>
+            <canvas id="chartAcceso" class="sensor-chart hidden"></canvas>
         </div>
     </section>
 
@@ -52,7 +66,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="/js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de Sesión - Stark Industries</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            background-color: #0b0b0d;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #4ea1ff;
+        }
+
+        form {
+            background-color: #16181d;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px #4ea1ff33;
+            width: 370px;
+            height: auto;
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: #22242a;
+            color: white;
+        }
+
+        button {
+            width: 95%;
+            background-color: #4ea1ff;
+            border: none;
+            padding: 10px;
+            color: white;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1f6fe0;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+
+        .logout-msg {
+            color: #4ea1ff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Stark Industries - Login</h1>
+
+<form method="post" action="/login">
+    <input type="text" name="username" placeholder="Usuario" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Iniciar Sesión</button>
+
+    <!-- Mostrar mensajes automáticos de Spring Security -->
+    <div class="error" th:if="${param.error}">Credenciales incorrectas</div>
+    <div class="logout-msg" th:if="${param.logout}">Sesión cerrada correctamente</div>
+</form>
+</body>
+</html>
