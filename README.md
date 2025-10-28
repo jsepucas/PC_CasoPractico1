@@ -2,7 +2,7 @@
 
 Enlace: https://github.com/jsepucas/PC_CasoPractico1.git
 
-## 👥 Integrantes del grupo
+## 👥 INTEGRANTES DEL GRUPO
 
 | Nombre  | NP            |
 |----------|--------------------------------|
@@ -12,7 +12,7 @@ Enlace: https://github.com/jsepucas/PC_CasoPractico1.git
 
 ---
 
-## 📘 Descripción general
+## [ 📘 ] DESCRIPCIÓN GENERAL
 
 Este proyecto implementa un **sistema de seguridad avanzado para Stark Industries**, diseñado para **monitorizar sensores de movimiento, temperatura y acceso en tiempo real**.  
 El objetivo es gestionar los datos de forma **concurrente, segura y eficiente**, garantizando una respuesta inmediata ante posibles amenazas o intrusiones.
@@ -21,7 +21,7 @@ El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring B
 
 ---
 
-## 🧠 Lógica general de la solución
+## [ 🧠 ] LÓGICA GENERAL DE LA SOLUCIÓN
 
 1. **Gestión de sensores:**  
    Cada tipo de sensor (movimiento, temperatura, acceso) está implementado como un *bean* independiente controlado por el contenedor de Spring (IoC).  
@@ -48,9 +48,9 @@ El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring B
 
 ---
 
-## ⚙️ Estructura del proyecto
+## [ ⚙️ ] ESTRUCTURA DEL PROYECTO
 
-> A continuación se detallan los archivos más relevantes para comprender la solución.
+> A continuación se detallan los archivos más relevantes para comprender la solución :)
 
 ### 🏗️ Configuración y arranque
 - **`StarkIndustriesApplication.java`** → Clase principal del proyecto. Inicializa Spring Boot y habilita `@EnableAsync` para la ejecución concurrente.  
@@ -83,7 +83,7 @@ El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring B
 
 ---
 
-## 🔐 Seguridad del sistema
+## [ 🔐 ] SEGURIDAD DEL SISTEMA
 
 - **Framework:** Spring Security  
 - **Roles definidos:**
@@ -99,14 +99,14 @@ El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring B
 
 ---
 
-## ⚡ Concurrencia y rendimiento
+## [ ⚡ ] CONCURRENCIA Y RENDIEMIENTO
 
 El uso de `@Async` y `ThreadPoolTaskExecutor` permite que los sensores se ejecuten de manera simultánea.  
 Cada lectura se procesa en hilos independientes y se envía al frontend en tiempo real, manteniendo la interfaz fluida incluso con múltiples eventos por segundo.  
 
 ---
 
-## 📡 Comunicación en tiempo real
+## [ 📡 ] COMUNICACIÓN EN TIEMPO REAL
 
 - **Backend → Frontend:** STOMP sobre WebSocket  
   - `/topic/data`: envía lecturas en tiempo real.  
@@ -115,14 +115,14 @@ Cada lectura se procesa en hilos independientes y se envía al frontend en tiemp
 
 ---
 
-## 📊 Monitorización y logs
+## [ 📊 ] MONOTORIZACIÓN Y LOGS
 
 - **Spring Actuator** habilitado para endpoints de salud y métricas.  
 - **Logging estructurado** mediante `@Slf4j`, mostrando actividad concurrente, alertas y autenticaciones.
 
 ---
 
-## ✅ Resultados y criterios de éxito
+## [ ✅ ] RESULTADOS Y CRITERIOS DE ÉXITO
 
 - El sistema procesa datos de tres sensores en paralelo sin bloqueos.  
 - Las gráficas se actualizan en tiempo real y las alertas aparecen inmediatamente.  
@@ -137,7 +137,7 @@ Cada lectura se procesa en hilos independientes y se envía al frontend en tiemp
 
 ---
 
-## 🎨 Elementos visuales
+## [ 🎨 ] ELEMENTOS VISUALES
 
 - **Gráficas (Chart.js):** evolución de cada sensor.  
 - **Tabla dinámica:** últimos eventos registrados.  
@@ -146,7 +146,7 @@ Cada lectura se procesa en hilos independientes y se envía al frontend en tiemp
 
 ---
 
-## 📚 Referencias
+## [ 📚 ] REFERENCIAS
 
 - [Spring Framework Documentation](https://spring.io/projects/spring-framework)  
 - [Spring Boot Reference Guide](https://spring.io/projects/spring-boot)  
@@ -155,7 +155,7 @@ Cada lectura se procesa en hilos independientes y se envía al frontend en tiemp
 
 ---
 
-## ▶️ Ejecución del proyecto
+## [ ▶️ ] EJECUCIÓN DEL PROYECTO
 
 1. Abrir el proyecto en IntelliJ o Eclipse.  
 2. Ejecutar la clase principal `StarkIndustriesApplication.java`.  
