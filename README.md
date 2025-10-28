@@ -1,4 +1,6 @@
-# 🛰️ Stark Industries – Sistema de Seguridad Concurrente
+# [ PC ] Stark Industries – Sistema de Seguridad Concurrente
+
+Enlace: https://github.com/jsepucas/PC_CasoPractico1.git
 
 ## 👥 Integrantes del grupo
 
@@ -160,3 +162,10 @@ Cada lectura se procesa en hilos independientes y se envía al frontend en tiemp
    O desde consola:
    ```bash
    mvn spring-boot:run
+
+3. Acceder en el navegador a:
+   ```bash
+   http://localhost:8080/login
+
+4. Iniciar sesión con cualquiera de los usuarios de prueba.
+5. Visualizar el panel con las gráficas, tabla de eventos y alertas en tiempo real.
