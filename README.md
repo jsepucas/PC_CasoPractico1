@@ -77,7 +77,7 @@ Este proyecto implementa un sistema de seguridad para Stark Industries capaz de 
 ## [ 📌 ]  Diagrama referenciado desde la clase principal
 El diagrama de arquitectura del sistema se encuentra en el archivo `docs/architecture-diagram.svg`. A continuación se incluye una versión en imagen PNG para referencia rápida:
 ![img.png](img.png)
-Leyenda rápida (versión compacta):
+
 - Navegador: dashboard (Thymeleaf + JS) suscrito a `/topic/data` y `/topic/alerts`.
 - Backend: `Config` (WebSocket/Async/Security), `Controllers`, `Services`, `Model` (`SensorData`).
 - Flujos: `SensorSimulationService` -> Servicios de sensor -> `NotificationService` -> WebSocket -> Cliente.
