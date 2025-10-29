@@ -1,24 +1,19 @@
 package com.starkindustries.securitysystem.Service;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-/**
- * Servicio responsable de enviar notificaciones y datos en tiempo real
- * a través de WebSocket (STOMP).
- *
- * Envía dos tipos de mensajes:
- * - /topic/data  → datos normales de sensores
- * - /topic/alerts → alertas críticas
- */
 @Service
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final Counter eventsProcessedCounter;
 
-    // Declaración de variables para contadores de alertas y temperatura media
     private int totalAlerts = 0;
     private int movimientoAlerts = 0;
     private int temperaturaAlerts = 0;
@@ -26,42 +21,55 @@ public class NotificationService {
     private double totalTemperatura = 0;
     private int totalTemperaturaCount = 0;
 
-    // Constructor donde se inyecta el SimpMessagingTemplate
-    public NotificationService(SimpMessagingTemplate messagingTemplate) {
+    // Constructor donde se inyecta SimpMessagingTemplate
+    @Autowired
+    public NotificationService(SimpMessagingTemplate messagingTemplate, MeterRegistry meterRegistry) {
         this.messagingTemplate = messagingTemplate;
+        this.eventsProcessedCounter = Counter.builder("events.processed")
+                .description("Número de lecturas de sensores procesadas")
+                .register(meterRegistry);
+    }
+
+    // Constructor adicional para facilitar los tests que usan SimpleMeterRegistry
+    public NotificationService(SimpMessagingTemplate messagingTemplate, io.micrometer.core.instrument.simple.SimpleMeterRegistry simpleMeterRegistry) {
+        this(messagingTemplate, (MeterRegistry) simpleMeterRegistry);
+    }
+
+    // Constructor conveniente para tests: crea internamente un SimpleMeterRegistry
+    public NotificationService(SimpMessagingTemplate messagingTemplate) {
+        this(messagingTemplate, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
     }
 
     /**
-     * Envía lecturas normales de sensores al frontend.
-     *
-     * @param type      tipo de sensor (movimiento, temperatura, acceso)
-     * @param value     valor leído
-     * @param critical  indica si la lectura es crítica
+     * Enviar los datos del sensor al frontend
      */
     public void sendSensorData(String type, double value, boolean critical) {
-        // Contabilizamos las alertas por tipo de sensor
+        // Incrementar la métrica de eventos procesados
+        this.eventsProcessedCounter.increment();
+
+        // Contabilizamos las alertas
         if (critical) {
             totalAlerts++;
             switch (type) {
                 case "movimiento":
-                    movimientoAlerts++; // Actualizamos las alertas de movimiento
+                    movimientoAlerts++;
                     break;
                 case "temperatura":
-                    temperaturaAlerts++; // Actualizamos las alertas de temperatura
+                    temperaturaAlerts++;
                     break;
                 case "acceso":
-                    accesoAlerts++; // Actualizamos las alertas de acceso
+                    accesoAlerts++;
                     break;
             }
         }
 
-        // Actualizamos la temperatura media (solo para el sensor de temperatura)
+        // Calcular la temperatura media
         if ("temperatura".equals(type)) {
             totalTemperatura += value;
             totalTemperaturaCount++;
         }
 
-        // Enviamos los datos al frontend con los contadores actualizados
+        // Enviar los datos al frontend con los contadores actualizados
         messagingTemplate.convertAndSend("/topic/data", Map.of(
                 "type", type,
                 "value", value,
@@ -75,16 +83,37 @@ public class NotificationService {
         ));
     }
 
-
     /**
-     * Envía una alerta crítica al frontend.
-     *
-     * @param message contenido textual de la alerta
+     * Enviar una alerta crítica al frontend
      */
     public void sendAlert(String message) {
         messagingTemplate.convertAndSend("/topic/alerts", Map.of(
                 "content", message,
                 "timestamp", System.currentTimeMillis()
         ));
+    }
+
+    public int getTotalAlerts() {
+        return totalAlerts;
+    }
+
+    public int getMovimientoAlerts() {
+        return movimientoAlerts;
+    }
+
+    public int getTemperaturaAlerts() {
+        return temperaturaAlerts;
+    }
+
+    public int getAccesoAlerts() {
+        return accesoAlerts;
+    }
+
+    public double getAverageTemperature() {
+        return totalTemperaturaCount > 0 ? totalTemperatura / totalTemperaturaCount : 0;
+    }
+
+    public double getEventsProcessed() {
+        return eventsProcessedCounter.count();
     }
 }

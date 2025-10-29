@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/dashboard", "/user").authenticated()
                         .requestMatchers("/api/sensor/**").hasAnyRole("ADMIN", "TECH")
+                        .requestMatchers("/api/stats").hasAnyRole("ADMIN", "TECH")
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )

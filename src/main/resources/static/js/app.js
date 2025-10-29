@@ -1,4 +1,6 @@
 let paused = false;
+let stompClient = null;
+let isStompConnected = false;
 
 // Estructuras para almacenar datos de los sensores
 const sensorData = {
@@ -13,6 +15,13 @@ let movimientoAlerts = 0;
 let temperaturaAlerts = 0;
 let accesoAlerts = 0;
 let averageTemperature = 0;
+// Últimos valores mostrados (aseguran monotonía en la UI)
+let lastMovimientoShown = 0;
+let lastTemperaturaShown = 0;
+let lastAccesoShown = 0;
+// Variables para calcular temperatura media en frontend (simulación)
+let tempSum = 0;
+let tempCount = 0;
 
 // Crear las gráficas
 const charts = {
@@ -56,95 +65,150 @@ function updateCharts() {
   });
 }
 
-// Función para actualizar los contadores de alertas
+// Añadimos una función que actualiza el dataset de un sensor concreto
+function updateSensorChart(type, value) {
+  if (!type || value === undefined || value === null) return;
+  const key = type.toString().trim().toLowerCase();
+  if (!sensorData.hasOwnProperty(key)) return;
+
+  sensorData[key].push(Number(value));
+  if (sensorData[key].length > 20) sensorData[key].shift();
+  updateCharts();
+}
+
 // Función para actualizar los contadores de alertas
 function updateCounters(data) {
-  // Verificamos si hay alertas para el sensor de movimiento
-  if (data.movimientoAlerts !== undefined) {
-    document.getElementById('movimiento-alerts').textContent = `Alertas Movimiento: ${data.movimientoAlerts}`;
-  }
+    // Si el backend no envía el contador, lo ignoramos.
+    if (data.movimientoAlerts !== undefined && data.movimientoAlerts !== null) {
+        const incoming = Number(data.movimientoAlerts);
+        if (!isNaN(incoming)) {
+            // Guardamos y mostramos el mayor entre lo que ya mostramos y lo entrante
+            lastMovimientoShown = Math.max(lastMovimientoShown, incoming);
+            document.getElementById('movimiento-count').textContent = lastMovimientoShown;
+        }
+    }
 
-  // Verificamos si hay alertas para el sensor de temperatura
-  if (data.temperaturaAlerts !== undefined) {
-    document.getElementById('temperatura-alerts').textContent = `Alertas Temperatura: ${data.temperaturaAlerts}`;
-  }
+    if (data.temperaturaAlerts !== undefined && data.temperaturaAlerts !== null) {
+        const incoming = Number(data.temperaturaAlerts);
+        if (!isNaN(incoming)) {
+            lastTemperaturaShown = Math.max(lastTemperaturaShown, incoming);
+            document.getElementById('temperatura-count').textContent = lastTemperaturaShown;
+        }
+    }
 
-  // Verificamos si hay alertas para el sensor de acceso
-  if (data.accesoAlerts !== undefined) {
-    document.getElementById('acceso-alerts').textContent = `Alertas Acceso: ${data.accesoAlerts}`;
-  }
+    if (data.accesoAlerts !== undefined && data.accesoAlerts !== null) {
+        const incoming = Number(data.accesoAlerts);
+        if (!isNaN(incoming)) {
+            lastAccesoShown = Math.max(lastAccesoShown, incoming);
+            document.getElementById('acceso-count').textContent = lastAccesoShown;
+        }
+    }
 
-  // Actualizamos la temperatura media
-  if (data.averageTemperature !== undefined) {
-    document.getElementById('average-temperature').textContent = `Temperatura media: ${data.averageTemperature.toFixed(2)}°C`;
-  }
+    // Temperatura media: la media puede subir o bajar, la mostramos tal cual si viene
+    if (data.averageTemperature !== undefined && data.averageTemperature !== null) {
+        const avg = Number(data.averageTemperature);
+        if (!isNaN(avg)) {
+            document.getElementById('average-temp').textContent = avg.toFixed(2) + "°C";
+        }
+    }
 }
 
-
-// Conexión WebSocket para recibir datos en tiempo real
 // Conexión WebSocket para recibir datos en tiempo real
 function connectWebSocket() {
-  const socket = new SockJS('/ws/alerts');
-  stompClient = Stomp.over(socket);
+    const socket = new SockJS('/ws/alerts');
+    stompClient = Stomp.over(socket);
 
-  stompClient.connect({}, (frame) => {
-    console.log('Conectado:', frame);
+    stompClient.connect({}, (frame) => {
+        console.log('Conectado:', frame);
+        isStompConnected = true;
 
-    stompClient.subscribe('/topic/data', (msg) => {
-      const data = JSON.parse(msg.body);
-      updateSensorChart(data.type, data.value);  // Actualizar los gráficos
-      addEventRow(data);  // Añadir eventos a la tabla
-      updateCounters(data);  // Actualizamos los contadores de alertas
+        stompClient.subscribe('/topic/data', (msg) => {
+            const payload = JSON.parse(msg.body);
+
+            // DEBUG: mostrar payload recibido
+            console.debug('WS /topic/data payload:', payload);
+
+            // Actualizar gráfico con el tipo y valor
+            updateSensorChart(payload.type, payload.value);
+
+            // Construir un evento compatible con addEventRow
+            const hora = payload.timestamp ? new Date(payload.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            const evento = {
+                hora,
+                sensor: payload.type || 'desconocido',
+                valor: (payload.value !== undefined && payload.value !== null) ? Number(payload.value).toFixed(2) : '—',
+                critico: payload.critical ? '⚠️' : '—'
+            };
+
+            addEventRow(evento);  // Añadir eventos a la tabla
+
+            // Primero aplicar cualquier contador absoluto que venga del backend
+            updateCounters({
+                movimientoAlerts: payload.movimientoAlerts,
+                temperaturaAlerts: payload.temperaturaAlerts,
+                accesoAlerts: payload.accesoAlerts,
+                averageTemperature: payload.averageTemperature
+            });
+
+            // Si el backend no envía contadores absolutos (o lo hace de forma opcional),
+            // incrementamos localmente el contador del sensor cuando es crítico para evitar saltos grandes.
+            if (payload.critical) {
+                const key = (payload.type || '').toString().trim().toLowerCase();
+                // Si no vino el contador absoluto para este tipo, hacemos incremento local
+                const absProvided = (key === 'movimiento' && payload.movimientoAlerts !== undefined)
+                    || (key === 'temperatura' && payload.temperaturaAlerts !== undefined)
+                    || (key === 'acceso' && payload.accesoAlerts !== undefined);
+
+                if (!absProvided) {
+                    switch (key) {
+                        case 'movimiento':
+                            lastMovimientoShown = Math.max(lastMovimientoShown + 1, lastMovimientoShown + 1);
+                            document.getElementById('movimiento-count').textContent = lastMovimientoShown;
+                            break;
+                        case 'temperatura':
+                            lastTemperaturaShown = Math.max(lastTemperaturaShown + 1, lastTemperaturaShown + 1);
+                            document.getElementById('temperatura-count').textContent = lastTemperaturaShown;
+                            break;
+                        case 'acceso':
+                            lastAccesoShown = Math.max(lastAccesoShown + 1, lastAccesoShown + 1);
+                            document.getElementById('acceso-count').textContent = lastAccesoShown;
+                            break;
+                    }
+                }
+            }
+        });
+
+        stompClient.subscribe('/topic/alerts', (alert) => {
+            const message = JSON.parse(alert.body);
+            showAlert(message.content);  // Mostrar alerta en el panel
+        });
+    }, (err) => {
+        console.error('STOMP connect error', err);
+        isStompConnected = false;
     });
-
-    stompClient.subscribe('/topic/alerts', (alert) => {
-      const message = JSON.parse(alert.body);
-      showAlert(message.content);  // Mostrar alerta en el panel
-    });
-  });
-}
-
-
-// Maneja nueva lectura simulada
-function onNewSensorData(sensor, value, isCritical) {
-  if (paused) return;
-
-  sensorData[sensor].push(value);
-  if (sensorData[sensor].length > 20) sensorData[sensor].shift();
-  updateCharts();
-
-  const hora = new Date().toLocaleTimeString();
-  const evento = {
-    hora,
-    sensor,
-    valor: value.toFixed(2),
-    critico: isCritical ? "⚠️" : "—"
-  };
-  addEventRow(evento);
-
-  if (isCritical) {
-    showAlert(`Alerta crítica detectada en sensor de ${sensor.toUpperCase()} (valor: ${value.toFixed(2)})`);
-  }
 }
 
 // Mostrar alerta en tiempo real
 function showAlert(message) {
-  const container = document.getElementById("alert-container");
-  const alert = document.createElement("div");
-  alert.className = "alert";
-  alert.textContent = message;
-  container.prepend(alert);
-  setTimeout(() => alert.remove(), 5000);
+    const container = document.getElementById("alert-container");
+    const alert = document.createElement("div");
+    alert.className = "alert";
+    alert.textContent = message;
+    container.prepend(alert);
+    setTimeout(() => alert.remove(), 5000);
 }
 
 // Añadir evento a la tabla de eventos recientes
 function addEventRow({ hora, sensor, valor, critico }) {
-  const tabla = document.getElementById("tabla-eventos");
-  const fila = document.createElement("tr");
-  fila.innerHTML = `<td>${hora}</td><td>${sensor}</td><td>${valor}</td><td>${critico}</td>`;
-  tabla.prepend(fila);
-  if (tabla.rows.length > 10) tabla.deleteRow(10);
+    const tabla = document.getElementById("tabla-eventos");
+    const fila = document.createElement("tr");
+    fila.innerHTML = `<td>${hora}</td><td>${sensor}</td><td>${valor}</td><td>${critico}</td>`;
+    tabla.prepend(fila);
+    if (tabla.rows.length > 10) tabla.deleteRow(10);
 }
+
+// Conectar a WebSocket al cargar la página
+document.addEventListener("DOMContentLoaded", connectWebSocket);
 
 // Control de pausa / reanudación
 document.getElementById("pause-btn").addEventListener("click", () => {
@@ -157,6 +221,28 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   Object.keys(sensorData).forEach(sensor => sensorData[sensor] = []);
   document.getElementById("tabla-eventos").innerHTML = "";
   document.getElementById("alert-container").innerHTML = "";
+
+  // Si estamos conectados al servidor, no resetear los contadores locales: el backend es la fuente de la verdad
+  if (!isStompConnected) {
+    totalAlerts = 0;
+    movimientoAlerts = 0;
+    temperaturaAlerts = 0;
+    accesoAlerts = 0;
+    tempSum = 0;
+    tempCount = 0;
+    averageTemperature = 0;
+    // Resetear también los últimos mostrados
+    lastMovimientoShown = 0;
+    lastTemperaturaShown = 0;
+    lastAccesoShown = 0;
+    updateCounters({
+      movimientoAlerts,
+      temperaturaAlerts,
+      accesoAlerts,
+      averageTemperature
+    });
+  }
+
   updateCharts();
 });
 
@@ -185,6 +271,59 @@ setInterval(() => {
 
   onNewSensorData(sensor, valor, isCritical);
 }, 2000);
+
+// Maneja nueva lectura simulada
+function onNewSensorData(sensor, value, isCritical) {
+  if (paused) return;
+
+  sensorData[sensor].push(value);
+  if (sensorData[sensor].length > 20) sensorData[sensor].shift();
+  updateCharts();
+
+  const hora = new Date().toLocaleTimeString();
+  const evento = {
+    hora,
+    sensor,
+    valor: value.toFixed(2),
+    critico: isCritical ? "⚠️" : "—"
+  };
+  addEventRow(evento);
+
+  // Actualizar contadores locales para la simulación solamente si NO estamos conectados al servidor
+  if (!isStompConnected) {
+    if (isCritical) {
+      totalAlerts++;
+      switch (sensor) {
+        case 'movimiento':
+          movimientoAlerts++;
+          break;
+        case 'temperatura':
+          temperaturaAlerts++;
+          break;
+        case 'acceso':
+          accesoAlerts++;
+          break;
+      }
+    }
+
+    if (sensor === 'temperatura') {
+      tempSum += value;
+      tempCount++;
+      averageTemperature = tempCount > 0 ? tempSum / tempCount : 0;
+    }
+
+    updateCounters({
+      movimientoAlerts,
+      temperaturaAlerts,
+      accesoAlerts,
+      averageTemperature
+    });
+  }
+
+  if (isCritical && !isStompConnected) {
+    showAlert(`Alerta crítica detectada en sensor de ${sensor.toUpperCase()} (valor: ${value.toFixed(2)})`);
+  }
+}
 
 // ========== MOSTRAR USUARIO ==========
 

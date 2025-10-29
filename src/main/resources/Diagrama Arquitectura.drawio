@@ -1,0 +1,34 @@
+<mxfile host="drawio-plugin" modified="2025-10-29T21:17:54.694Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="nKyVW85JDmrU2uvovCGN" version="22.1.22" type="embed">
+  <diagram id="23iRSUPoRavnBvh4doch" name="Page-1">
+    <mxGraphModel dx="680" dy="935" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="&lt;b&gt;&lt;u&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Cliente / Fronted&lt;/font&gt;&lt;/u&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;" vertex="1" parent="1">
+          <mxGeometry x="10" y="220" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;strokeColor=#080808;fillColor=#2B2B2B;" edge="1" parent="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="230" y="270" as="sourcePoint" />
+            <mxPoint x="320" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9" value="&lt;ul&gt;&lt;li&gt;Browser (dashboard)&lt;/li&gt;&lt;li&gt;JS: &#39;static/js/app.js&#39;&amp;nbsp;&lt;/li&gt;&lt;li&gt;CSS: &#39;static/css/styles.css&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Templates: &#39;templates/*.html&#39;&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="10" y="250" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="&lt;b&gt;&lt;u&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Backend - Spring Boot&lt;/font&gt;&lt;/u&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#76608a;strokeColor=#432D57;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="330" y="220" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="&lt;ul&gt;&lt;li&gt;AppStarkSistemaSeguridad.java&amp;nbsp; STOMP/WS (WebScoket)&lt;/li&gt;&lt;/ul&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; Packages&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&#39;Config&#39;&lt;/span&gt;&lt;br&gt;&lt;/li&gt;&lt;ul&gt;&lt;li&gt;`AsyncConfig.java`&lt;br&gt;&lt;/li&gt;&lt;li&gt;`SecurityConfig.java`&lt;br&gt;&lt;/li&gt;&lt;li&gt;`WebSocketConfig.java`&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;&#39;Controller&#39;&lt;/li&gt;&lt;ul&gt;&lt;li&gt;`HomeController.java`&amp;nbsp; &amp;nbsp;&lt;/li&gt;&lt;li&gt;`DashboardController.java`&lt;/li&gt;&lt;li&gt;`SensorController.java`&amp;nbsp;&lt;/li&gt;&lt;li&gt;`StatsController.java`&amp;nbsp; &amp;nbsp;&lt;/li&gt;&lt;li&gt;`UserController.java`&amp;nbsp;&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&#39;Service&#39;&lt;/span&gt;&lt;/li&gt;&lt;ul&gt;&lt;li&gt;`SensorSimulationService.java`&lt;/li&gt;&lt;li&gt;`MotionSensorService.java`&lt;br&gt;&lt;/li&gt;&lt;li&gt;`TemperatureSensorService.java`&lt;br&gt;&lt;/li&gt;&lt;li&gt;`AccessSensorService.java`&amp;nbsp;&lt;br&gt;&lt;/li&gt;&lt;li&gt;`NotificationService.java`&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;&#39;Model&#39;&lt;/li&gt;&lt;ul&gt;&lt;li&gt;&#39;SensorData.java`&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;Resources&lt;/li&gt;&lt;ul&gt;&lt;li&gt;`application.properties`&lt;br&gt;&lt;/li&gt;&lt;li&gt;&#39;static/...&#39;&lt;/li&gt;&lt;/ul&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="330" y="250" width="270" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="&lt;b&gt;&lt;u&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Test&lt;/font&gt;&lt;/u&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a0522d;strokeColor=#6D1F00;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="650" y="220" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="- NotificationServiceTest.java" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="250" width="160" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

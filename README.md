@@ -7,43 +7,35 @@ Enlace: https://github.com/jsepucas/PC_CasoPractico1.git
 | Nombre  | NP            |
 |----------|--------------------------------|
 | **Pablo García** | 165210 |
-| **Juan Sepúlveda**  | 154412 | 
-| **Nerea Quintanilla** | 154409 | 
+| **Juan Sepúlveda**  | 154412 |
+| **Nerea Quintanilla** | 154409 |
 
 ---
 
 ## [ 📘 ] DESCRIPCIÓN GENERAL
 
-Este proyecto implementa un **sistema de seguridad avanzado para Stark Industries**, diseñado para **monitorizar sensores de movimiento, temperatura y acceso en tiempo real**.  
-El objetivo es gestionar los datos de forma **concurrente, segura y eficiente**, garantizando una respuesta inmediata ante posibles amenazas o intrusiones.
-
-El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring Boot**, **Spring Security**, **WebSocket (STOMP)**, **Thymeleaf** y **Chart.js** para ofrecer una solución completa: backend concurrente, control de acceso robusto y una interfaz visual moderna.
+Este proyecto implementa un sistema de seguridad para Stark Industries capaz de monitorizar sensores de movimiento, temperatura y acceso en tiempo real. Se construyó con Spring Boot y herramientas del ecosistema Spring para proporcionar concurrencia, seguridad y comunicación en tiempo real hacia un frontend basado en Thymeleaf y Chart.js.
 
 ---
 
 ## [ 🧠 ] LÓGICA GENERAL DE LA SOLUCIÓN
 
-1. **Gestión de sensores:**  
-   Cada tipo de sensor (movimiento, temperatura, acceso) está implementado como un *bean* independiente controlado por el contenedor de Spring (IoC).  
+1. **Gestión de sensores:**
+   Cada tipo de sensor (movimiento, temperatura, acceso) está implementado como un *bean* independiente controlado por el contenedor de Spring (IoC).
    Se utiliza `@Async` junto con un `ThreadPoolTaskExecutor` para procesar los datos de forma paralela y no bloqueante.
 
-2. **Procesamiento concurrente:**  
-   Los sensores generan lecturas simuladas en paralelo mediante `@Scheduled` y `@Async`.  
+2. **Procesamiento concurrente:**
+   Los sensores generan lecturas simuladas en paralelo mediante `@Scheduled` y `@Async`.
    Estas lecturas son procesadas en tiempo real y publicadas en canales STOMP accesibles desde el frontend.
 
-3. **Control de acceso:**  
-   El sistema implementa **Spring Security** con diferentes roles:  
-   - `ADMIN`: acceso completo (incluido Actuator y configuración).  
-   - `TECH`: acceso a API de sensores.  
-   - `USER`: acceso limitado al panel de visualización.  
-   Se definen usuarios en memoria con contraseñas encriptadas.
+3. **Control de acceso:**
+   El sistema implementa **Spring Security** con diferentes roles y reglas de acceso definidas en `SecurityConfig`.
 
-4. **Notificaciones en tiempo real:**  
-   Se utiliza **WebSocket** con STOMP para enviar datos y alertas desde el backend al frontend.  
-   Las alertas críticas (por ejemplo, temperatura alta o movimiento sospechoso) se muestran instantáneamente en pantalla.
+4. **Notificaciones en tiempo real:**
+   Se utiliza **WebSocket** con STOMP para enviar datos y alertas desde el backend al frontend.
 
-5. **Monitorización y logs:**  
-   **Spring Actuator** está habilitado para supervisar el estado del sistema (`/actuator/health`, `/actuator/metrics`).  
+5. **Monitorización y logs:**
+   **Spring Actuator** está habilitado para supervisar el estado del sistema (`/actuator/health`, `/actuator/metrics`).
    Además, los servicios usan `@Slf4j` para registrar la actividad y los eventos de seguridad.
 
 ---
@@ -53,119 +45,125 @@ El sistema se apoya en el ecosistema **Spring Framework**, combinando **Spring B
 > A continuación se detallan los archivos más relevantes para comprender la solución :)
 
 ### 🏗️ Configuración y arranque
-- **`StarkIndustriesApplication.java`** → Clase principal del proyecto. Inicializa Spring Boot y habilita `@EnableAsync` para la ejecución concurrente.  
+- **`AppStarkSistemaSeguridad.java`** → Clase principal del proyecto (punto de entrada). Inicializa Spring Boot y habilita `@EnableAsync` para la ejecución concurrente.
 - **`application.properties`** → Configuración de servidor, logging, Actuator, WebSocket y seguridad.
 
 ### ⚙️ Configuración de Spring
-- **`config/AsyncConfig.java`** → Define el *thread pool* usado por los procesos asíncronos de los sensores.  
-- **`config/SecurityConfig.java`** → Configura usuarios, roles y las reglas de acceso mediante Spring Security.  
-- **`config/WebSocketConfig.java`** → Establece el endpoint `/ws/alerts` y el broker `/topic/**` para comunicación en tiempo real.
+- **`Config/AsyncConfig.java`** → Define el *thread pool* usado por los procesos asíncronos de los sensores.
+- **`Config/SecurityConfig.java`** → Configura usuarios, roles y las reglas de acceso mediante Spring Security.
+- **`Config/WebSocketConfig.java`** → Establece el endpoint WebSocket y el broker para comunicación en tiempo real.
 
 ### 📡 Controladores
-- **`controller/HomeController.java`** → Gestiona rutas de inicio y redirecciones a login o dashboard.  
-- **`controller/DashboardController.java`** → Carga el panel principal y los datos del usuario autenticado.  
-- **`controller/SensorController.java`** → Recibe y enruta datos de sensores hacia los servicios correspondientes.
+- **`Controller/HomeController.java`** → Gestiona rutas de inicio y redirecciones a login o dashboard.
+- **`Controller/DashboardController.java`** → Carga el panel principal y los datos del usuario autenticado.
+- **`Controller/SensorController.java`** → Recibe y enruta datos de sensores hacia los servicios correspondientes.
 
 ### 🧠 Servicios
-- **`service/SensorSimulationService.java`** → Simula lecturas periódicas de sensores usando `@Scheduled` y `@Async`.  
-- **`service/MovementSensorService.java`**, **`TemperatureSensorService.java`**, **`AccessSensorService.java`** → Procesan cada tipo de sensor y determinan condiciones críticas.  
-- **`service/NotificationService.java`** → Publica los datos y alertas en los canales STOMP del frontend.  
-- **`service/SecurityLogService.java`** → Registra logs de actividad y eventos de seguridad.
+- **`Service/SensorSimulationService.java`** → Simula lecturas periódicas de sensores usando `@Scheduled` y `@Async`.
+- **`Service/MotionSensorService.java`**, **`Service/TemperatureSensorService.java`**, **`Service/AccessSensorService.java`** → Procesan cada tipo de sensor y determinan condiciones críticas.
+- **`Service/NotificationService.java`** → Publica los datos y alertas en los canales STOMP del frontend.
 
 ### 💾 Modelos
-- **`model/SensorData.java`** → Clase que representa cada lectura (tipo, valor, criticidad, timestamp).
+- **`Model/SensorData.java`** → Clase que representa cada lectura (tipo, valor, criticidad, timestamp).
 
 ### 💻 Interfaz de usuario
-- **`templates/login.html`** → Página de inicio de sesión integrada con Spring Security.  
-- **`templates/dashboard.html`** → Panel visual con tres gráficas en tiempo real, tabla de eventos y alertas dinámicas.  
-- **`static/js/app.js`** → Controla las gráficas (Chart.js), eventos recientes, alertas y el estado de pausa/reinicio.  
-- **`static/css/style.css`** → Estilos visuales del panel (modo oscuro, layout adaptativo).
+- **`templates/login.html`** → Página de inicio de sesión integrada con Spring Security.
+- **`templates/dashboard.html`** → Panel visual con tres gráficas en tiempo real, tabla de eventos y alertas dinámicas.
+- **`static/js/app.js`** → Controla las gráficas (Chart.js), eventos recientes, alertas y el estado de pausa/reinicio.
+- **`static/css/styles.css`** → Estilos visuales del panel (modo oscuro, layout adaptativo).
 
 ---
 
-## [ 🔐 ] SEGURIDAD DEL SISTEMA
-
-- **Framework:** Spring Security  
-- **Roles definidos:**
-  - `ADMIN` → acceso completo y monitorización (Actuator).  
-  - `TECH` → acceso a API de sensores.  
-  - `USER` → acceso de solo lectura al panel.
-- **Usuarios de prueba:**
-  | Usuario | Contraseña | Rol |
-  |----------|-------------|-----|
-  | `tony` | `ironman` | ADMIN |
-  | `rhodey` | `war_machine` | TECH |
-  | `pepper` | `rescue` | USER |
-
----
-
-## [ ⚡ ] CONCURRENCIA Y RENDIEMIENTO
-
-El uso de `@Async` y `ThreadPoolTaskExecutor` permite que los sensores se ejecuten de manera simultánea.  
-Cada lectura se procesa en hilos independientes y se envía al frontend en tiempo real, manteniendo la interfaz fluida incluso con múltiples eventos por segundo.  
-
----
-
-## [ 📡 ] COMUNICACIÓN EN TIEMPO REAL
-
-- **Backend → Frontend:** STOMP sobre WebSocket  
-  - `/topic/data`: envía lecturas en tiempo real.  
-  - `/topic/alerts`: notifica alertas críticas.  
-- **Frontend:** recibe las actualizaciones y las refleja en las gráficas y tabla sin recargar la página.  
-
----
-
-## [ 📊 ] MONOTORIZACIÓN Y LOGS
-
-- **Spring Actuator** habilitado para endpoints de salud y métricas.  
-- **Logging estructurado** mediante `@Slf4j`, mostrando actividad concurrente, alertas y autenticaciones.
-
----
-
-## [ ✅ ] RESULTADOS Y CRITERIOS DE ÉXITO
-
-- El sistema procesa datos de tres sensores en paralelo sin bloqueos.  
-- Las gráficas se actualizan en tiempo real y las alertas aparecen inmediatamente.  
-- El control de acceso funciona correctamente según el rol de cada usuario.  
-- Los endpoints de Actuator permiten verificar el estado general del sistema.
-
-**Criterios cumplidos:**
-- Procesamiento concurrente eficiente.  
-- Alertas entregadas en tiempo real.  
-- Control de acceso funcional y seguro.  
-- Sistema estable, monitorizable y sin caídas.
-
----
-
-## [ 🎨 ] ELEMENTOS VISUALES
-
-- **Gráficas (Chart.js):** evolución de cada sensor.  
-- **Tabla dinámica:** últimos eventos registrados.  
-- **Alertas visuales:** notificaciones en pantalla ante detecciones críticas.  
-- **Panel unificado:** interfaz moderna con identidad visual de Stark Industries.
+## [ 📌 ]  Diagrama referenciado desde la clase principal
+El diagrama de arquitectura del sistema se encuentra en el archivo `docs/architecture-diagram.svg`. A continuación se incluye una versión en imagen PNG para referencia rápida:
+![img.png](img.png)
+Leyenda rápida (versión compacta):
+- Navegador: dashboard (Thymeleaf + JS) suscrito a `/topic/data` y `/topic/alerts`.
+- Backend: `Config` (WebSocket/Async/Security), `Controllers`, `Services`, `Model` (`SensorData`).
+- Flujos: `SensorSimulationService` -> Servicios de sensor -> `NotificationService` -> WebSocket -> Cliente.
 
 ---
 
 ## [ 📚 ] REFERENCIAS
 
-- [Spring Framework Documentation](https://spring.io/projects/spring-framework)  
-- [Spring Boot Reference Guide](https://spring.io/projects/spring-boot)  
-- [Spring Security Reference](https://spring.io/projects/spring-security)  
+- [Spring Framework Documentation](https://spring.io/projects/spring-framework)
+- [Spring Boot Reference Guide](https://spring.io/projects/spring-boot)
+- [Spring Security Reference](https://spring.io/projects/spring-security)
 - [Baeldung: Spring WebSocket + STOMP Guide](https://www.baeldung.com/websockets-spring)
 
 ---
 
-## [ ▶️ ] EJECUCIÓN DEL PROYECTO
+## 📦 Requisitos / Pre-requisitos
 
-1. Abrir el proyecto en IntelliJ o Eclipse.  
-2. Ejecutar la clase principal `StarkIndustriesApplication.java`.  
-   O desde consola:
-   ```bash
-   mvn spring-boot:run
+- Java (JDK): versión requerida definida en `pom.xml`: Java 17.
+- Maven: Apache Maven (compatible con la versión de Spring Boot usada). Se recomienda la última versión 3.x estable.
+- Navegador soportado: navegadores modernos con soporte WebSocket (Chrome, Firefox, Edge). Se probó principalmente con Chrome.
 
-3. Acceder en el navegador a:
-   ```bash
-   http://localhost:8080/login
+### Comandos de build y test
 
-4. Iniciar sesión con cualquiera de los usuarios de prueba.
-5. Visualizar el panel con las gráficas, tabla de eventos y alertas en tiempo real.
+- Compilar y ejecutar tests (completo):
+
+    mvn clean test
+
+- Ejecutar un test concreto (ejemplo con un test de servicio):
+
+    mvn -Dtest=com.starkindustries.securitysystem.Service.NotificationServiceTest test
+
+- Ejecutar la aplicación desde consola (método rápido durante desarrollo):
+
+    mvn spring-boot:run
+
+
+## ▶️ Ejecutar desde IntelliJ
+
+1. Abrir el proyecto en IntelliJ (File → Open) seleccionando la carpeta raíz del proyecto.
+2. Esperar a que IntelliJ importe el proyecto Maven y descargue dependencias.
+3. Localizar la clase principal `AppStarkSistemaSeguridad.java` (paquete `com.starkindustries.securitysystem`).
+4. Ejecutar con Run → Run 'AppStarkSistemaSeguridad' o crear una configuración de ejecución tipo 'Application'.
+
+
+## ⚙️ Variables importantes en `application.properties`
+
+Archivo: `src/main/resources/application.properties` — variables clave que puedes ajustar:
+
+- `server.port` (por defecto `8080`): puerto donde escucha la aplicación.
+  - Cambiar para evitar conflictos con otros servicios.
+- `logging.level.root` (por defecto `INFO`): nivel de logs. Para desarrollo puedes usar `DEBUG`.
+- `logging.pattern.console`: formato de salida de logs en consola.
+- `management.endpoints.web.exposure.include`: controla qué endpoints de Actuator se exponen (por defecto: `health,info,metrics,prometheus`).
+- `management.endpoint.health.show-details`: puede valer `always` para mostrar detalles de salud.
+
+Dónde cambiarlas: editar `src/main/resources/application.properties` y reiniciar la aplicación. Para perfiles (p. ej. `application-dev.properties`) puedes añadir archivos de propiedades por perfil y activar con `-Dspring.profiles.active=dev`.
+
+---
+
+---
+
+## Notas rápidas sobre lo que he cambiado y cómo probar localmente
+
+- Corregí un problema de inicialización del bean `NotificationService` (se añadió la anotación `@Autowired` en el constructor principal) para evitar el error "No default constructor found" al arrancar la aplicación.
+- En este entorno no se encuentra el comando `mvn` (el sistema me devolvió "mvn: command not found") al intentar ejecutar tests desde terminal. Opciones:
+  - Ejecutar la aplicación desde IntelliJ (Run 'AppStarkSistemaSeguridad') — IntelliJ usa su Maven embebido si está configurado.
+  - Instalar Apache Maven y ejecutar `mvn clean test` en la consola.
+
+---
+
+## 📍 Ubicación en el código y leyenda
+
+- Ubicación del diagrama (archivo): `docs/architecture-diagram.svg` — ábrelo en tu navegador o insértalo en presentaciones.
+- Si prefieres que el diagrama esté referenciado desde el código fuente, puedes añadir un comentario o Javadoc en la clase principal `src/main/java/com/starkindustries/securitysystem/AppStarkSistemaSeguridad.java` con una línea como:
+
+```java
+// Ver diagrama de arquitectura: ../../docs/architecture-diagram.svg
+```
+
+Leyenda del diagrama (qué significa cada caja/flecha):
+- Navegador / Frontend: dashboard (Thymeleaf + JS), suscrito a `/topic/data` y `/topic/alerts` vía STOMP/WebSocket.
+- Backend Spring Boot: contiene `Config` (WebSocket/Async/Security), `Controllers`, `Services` y `Model` (`SensorData`).
+- `SensorSimulationService`: genera lecturas simuladas (tareas programadas + `@Async`).
+- Servicios de sensor: `MotionSensorService`, `TemperatureSensorService`, `AccessSensorService` — procesan lecturas y determinan criticidad.
+- `NotificationService`: publica mensajes STOMP y actualiza métricas (`MeterRegistry`).
+- Flechas entre componentes:
+  - Cliente ↔ Backend (bidireccional): STOMP/WebSocket — flujo en tiempo real para datos y alertas.
+  - `SensorSimulationService` → Servicios de sensor: lecturas programadas y procesamiento asíncrono.
+  - Servicios de sensor → `NotificationService` → WebSocket → Cliente: notificaciones y datos en tiempo real.

@@ -9,6 +9,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * - Usa Spring Boot 3.5.6.
  * - Habilita el procesamiento asíncrono mediante @EnableAsync.
  * - Este es el punto de entrada principal de la aplicación.
+ *
+ * Diagrama de arquitectura:
+ *   docs/architecture-diagram.svg
+ *   (abre el archivo en el navegador o insértalo en presentaciones)
  */
 @SpringBootApplication
 @EnableAsync
