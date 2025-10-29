@@ -84,16 +84,7 @@ Leyenda rápida (versión compacta):
 
 ---
 
-## [ 📚 ] REFERENCIAS
-
-- [Spring Framework Documentation](https://spring.io/projects/spring-framework)
-- [Spring Boot Reference Guide](https://spring.io/projects/spring-boot)
-- [Spring Security Reference](https://spring.io/projects/spring-security)
-- [Baeldung: Spring WebSocket + STOMP Guide](https://www.baeldung.com/websockets-spring)
-
----
-
-## 📦 Requisitos / Pre-requisitos
+## [ 📦 ] Requisitos / Pre-requisitos
 
 - Java (JDK): versión requerida definida en `pom.xml`: Java 17.
 - Maven: Apache Maven (compatible con la versión de Spring Boot usada). Se recomienda la última versión 3.x estable.
@@ -114,7 +105,7 @@ Leyenda rápida (versión compacta):
     mvn spring-boot:run
 
 
-## ▶️ Ejecutar desde IntelliJ
+## [ ▶️ ] Ejecutar desde IntelliJ
 
 1. Abrir el proyecto en IntelliJ (File → Open) seleccionando la carpeta raíz del proyecto.
 2. Esperar a que IntelliJ importe el proyecto Maven y descargue dependencias.
@@ -137,14 +128,9 @@ Dónde cambiarlas: editar `src/main/resources/application.properties` y reinicia
 
 ---
 
----
+## [ 📚 ] REFERENCIAS
 
-## Notas rápidas sobre lo que he cambiado y cómo probar localmente
-
-- Corregí un problema de inicialización del bean `NotificationService` (se añadió la anotación `@Autowired` en el constructor principal) para evitar el error "No default constructor found" al arrancar la aplicación.
-- En este entorno no se encuentra el comando `mvn` (el sistema me devolvió "mvn: command not found") al intentar ejecutar tests desde terminal. Opciones:
-  - Ejecutar la aplicación desde IntelliJ (Run 'AppStarkSistemaSeguridad') — IntelliJ usa su Maven embebido si está configurado.
-  - Instalar Apache Maven y ejecutar `mvn clean test` en la consola.
-
----
-
+- [Spring Framework Documentation](https://spring.io/projects/spring-framework)
+- [Spring Boot Reference Guide](https://spring.io/projects/spring-boot)
+- [Spring Security Reference](https://spring.io/projects/spring-security)
+- [Baeldung: Spring WebSocket + STOMP Guide](https://www.baeldung.com/websockets-spring)
