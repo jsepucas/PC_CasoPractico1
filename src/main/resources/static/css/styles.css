@@ -31,6 +31,39 @@ h1 {
   margin: 0;
 }
 
+/* Cabecera: logo + título */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* espacio entre logo y título */
+}
+
+.logo {
+  /* Ajuste por defecto: un poco más grande para títulos */
+  height: 56px;
+  max-height: 56px;
+  width: auto;
+  display: inline-block;
+}
+
+/* Responsive: reducir logo en pantallas pequeñas */
+@media (max-width: 600px) {
+  .logo {
+    height: 36px;
+    max-height: 36px;
+  }
+  .header-left h1 {
+    font-size: 1rem;
+  }
+}
+
+/* Asegurar que el h1 no ocupe toda la línea y respete alineación vertical */
+.header-left h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #4ea1ff;
+}
+
 /* Botón base reutilizable para logout, pause, reset, etc. */
 .btn {
   background-color: #4ea1ff;
