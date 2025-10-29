@@ -148,22 +148,3 @@ Dónde cambiarlas: editar `src/main/resources/application.properties` y reinicia
 
 ---
 
-## 📍 Ubicación en el código y leyenda
-
-- Ubicación del diagrama (archivo): `docs/architecture-diagram.svg` — ábrelo en tu navegador o insértalo en presentaciones.
-- Si prefieres que el diagrama esté referenciado desde el código fuente, puedes añadir un comentario o Javadoc en la clase principal `src/main/java/com/starkindustries/securitysystem/AppStarkSistemaSeguridad.java` con una línea como:
-
-```java
-// Ver diagrama de arquitectura: ../../docs/architecture-diagram.svg
-```
-
-Leyenda del diagrama (qué significa cada caja/flecha):
-- Navegador / Frontend: dashboard (Thymeleaf + JS), suscrito a `/topic/data` y `/topic/alerts` vía STOMP/WebSocket.
-- Backend Spring Boot: contiene `Config` (WebSocket/Async/Security), `Controllers`, `Services` y `Model` (`SensorData`).
-- `SensorSimulationService`: genera lecturas simuladas (tareas programadas + `@Async`).
-- Servicios de sensor: `MotionSensorService`, `TemperatureSensorService`, `AccessSensorService` — procesan lecturas y determinan criticidad.
-- `NotificationService`: publica mensajes STOMP y actualiza métricas (`MeterRegistry`).
-- Flechas entre componentes:
-  - Cliente ↔ Backend (bidireccional): STOMP/WebSocket — flujo en tiempo real para datos y alertas.
-  - `SensorSimulationService` → Servicios de sensor: lecturas programadas y procesamiento asíncrono.
-  - Servicios de sensor → `NotificationService` → WebSocket → Cliente: notificaciones y datos en tiempo real.
