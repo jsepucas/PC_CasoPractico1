@@ -18,6 +18,27 @@
 </header>
 
 <main>
+    <section id="contador-alertas">
+        <h2>Contadores de Alertas por Sensor</h2>
+        <div id="alert-counts">
+            <div class="alert-box" id="movimiento-alerts">
+                Alertas Movimiento: 0
+            </div>
+            <div class="alert-box" id="temperatura-alerts">
+                Alertas Temperatura: 0
+            </div>
+            <div class="alert-box" id="acceso-alerts">
+                Alertas Acceso: 0
+            </div>
+            <div class="alert-box" id="average-temperature">
+                Temperatura media: 0.00°C
+            </div>
+        </div>
+
+    </section>
+
+
+
     <section id="alertas">
         <h2>Alertas en Tiempo Real</h2>
         <div id="alert-container"></div>
@@ -38,8 +59,8 @@
 
         <!-- Controles -->
         <div class="sensor-controls">
-            <button id="pause-btn" class="control-btn">⏸ Pausar</button>
-            <button id="reset-btn" class="control-btn">🔄 Resetear</button>
+            <button id="pause-btn" class="control-btn">⏸</button>
+            <button id="reset-btn" class="control-btn">🔄</button>
         </div>
 
         <!-- Contenedor dinámico del gráfico -->

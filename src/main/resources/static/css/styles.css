@@ -212,3 +212,34 @@ footer {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Estilo para los contadores de alertas (en formato de cuadrado) */
+#alert-counts {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.alert-box {
+    background-color: #1d232b;
+    color: white;
+    padding: 15px;
+    width: 150px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.alert-box p {
+    margin: 0;
+}
+
+/* Fondo y hover */
+.alert-box:hover {
+    background-color: #4ea1ff;
+    cursor: pointer;
+}

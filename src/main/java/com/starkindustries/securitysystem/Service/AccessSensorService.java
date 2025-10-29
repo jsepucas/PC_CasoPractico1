@@ -5,11 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-/**
- * Servicio que simula el procesamiento concurrente
- * del sensor de acceso.
- */
 @Slf4j
+
 @Service
 public class AccessSensorService {
 
@@ -23,12 +20,14 @@ public class AccessSensorService {
     public void processSensorData(SensorData data) {
         log.info("[SensorAcceso] Valor: {} (Crítico: {})", data.getValue(), data.isCritical());
 
-        // Enviar datos al frontend
+        // Enviar los datos al frontend
         notificationService.sendSensorData(data.getType(), data.getValue(), data.isCritical());
 
-        // Enviar alerta si aplica
+        // Enviar alerta si es crítica
         if (data.isCritical()) {
             notificationService.sendAlert("🚪 Acceso no autorizado detectado!");
         }
     }
 }
+
+

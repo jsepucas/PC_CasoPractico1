@@ -7,6 +7,13 @@ const sensorData = {
   acceso: []
 };
 
+// Variables para almacenar los contadores
+let totalAlerts = 0;
+let movimientoAlerts = 0;
+let temperaturaAlerts = 0;
+let accesoAlerts = 0;
+let averageTemperature = 0;
+
 // Crear las gráficas
 const charts = {
   movimiento: createChart('chartMovimiento', 'Sensor de Movimiento', '#4ea1ff'),
@@ -48,6 +55,55 @@ function updateCharts() {
     charts[sensor].update();
   });
 }
+
+// Función para actualizar los contadores de alertas
+// Función para actualizar los contadores de alertas
+function updateCounters(data) {
+  // Verificamos si hay alertas para el sensor de movimiento
+  if (data.movimientoAlerts !== undefined) {
+    document.getElementById('movimiento-alerts').textContent = `Alertas Movimiento: ${data.movimientoAlerts}`;
+  }
+
+  // Verificamos si hay alertas para el sensor de temperatura
+  if (data.temperaturaAlerts !== undefined) {
+    document.getElementById('temperatura-alerts').textContent = `Alertas Temperatura: ${data.temperaturaAlerts}`;
+  }
+
+  // Verificamos si hay alertas para el sensor de acceso
+  if (data.accesoAlerts !== undefined) {
+    document.getElementById('acceso-alerts').textContent = `Alertas Acceso: ${data.accesoAlerts}`;
+  }
+
+  // Actualizamos la temperatura media
+  if (data.averageTemperature !== undefined) {
+    document.getElementById('average-temperature').textContent = `Temperatura media: ${data.averageTemperature.toFixed(2)}°C`;
+  }
+}
+
+
+// Conexión WebSocket para recibir datos en tiempo real
+// Conexión WebSocket para recibir datos en tiempo real
+function connectWebSocket() {
+  const socket = new SockJS('/ws/alerts');
+  stompClient = Stomp.over(socket);
+
+  stompClient.connect({}, (frame) => {
+    console.log('Conectado:', frame);
+
+    stompClient.subscribe('/topic/data', (msg) => {
+      const data = JSON.parse(msg.body);
+      updateSensorChart(data.type, data.value);  // Actualizar los gráficos
+      addEventRow(data);  // Añadir eventos a la tabla
+      updateCounters(data);  // Actualizamos los contadores de alertas
+    });
+
+    stompClient.subscribe('/topic/alerts', (alert) => {
+      const message = JSON.parse(alert.body);
+      showAlert(message.content);  // Mostrar alerta en el panel
+    });
+  });
+}
+
 
 // Maneja nueva lectura simulada
 function onNewSensorData(sensor, value, isCritical) {
@@ -131,6 +187,7 @@ setInterval(() => {
 }, 2000);
 
 // ========== MOSTRAR USUARIO ==========
+
 async function loadUserInfo() {
   try {
     const res = await fetch("/user");
@@ -140,9 +197,11 @@ async function loadUserInfo() {
     document.getElementById("user-info").textContent = "Usuario: desconocido";
   }
 }
+
 document.addEventListener("DOMContentLoaded", loadUserInfo);
 
 // ========== SELECCIÓN DE SENSORES ==========
+
 const toggleSelector = document.getElementById("toggleSelector");
 const dropdown = document.getElementById("sensorDropdown");
 const options = document.querySelectorAll(".sensor-option");
