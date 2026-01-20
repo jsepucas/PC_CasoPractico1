@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 
+
+//Le avisa al sistema que esta clase es un servicio, hace calculos y lógica 
 @Service
 public class MotionSensorService {
 

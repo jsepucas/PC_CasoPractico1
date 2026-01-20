@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
     */
 @SpringBootApplication
 @EnableAsync
-public class    AppStarkSistemaSeguridad {
+public class AppStarkSistemaSeguridad {
 
     public static void main(String[] args) {
         SpringApplication.run(AppStarkSistemaSeguridad.class, args);
